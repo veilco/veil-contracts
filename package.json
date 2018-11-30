@@ -1,0 +1,34 @@
+{
+  "name": "veil-contracts",
+  "version": "0.0.1",
+  "description": "Contracts for Veil",
+  "main": "index.js",
+  "files": ["index.js", "build/**/*"],
+  "scripts": {
+    "test": "truffle test",
+    "lint": "solium --dir ./contracts",
+    "ganache": "sh ganache.sh",
+    "deploy:kovan": "truffle migrate --network kovan",
+    "deploy:mainnet": "truffle migrate --network mainnet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/veilmarket/veil-contracts.git"
+  },
+  "author": "Veil",
+  "devDependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1",
+    "chai-bignumber": "^2.0.2",
+    "dotenv": "^6.0.0",
+    "eth-gas-reporter": "^0.1.12",
+    "ethereumjs-util": "^5.2.0",
+    "ganache-cli": "^6.1.8",
+    "openzeppelin-solidity": "^1.12.0",
+    "solium": "^1.1.8",
+    "truffle-hdwallet-provider": "^0.0.6"
+  }
+}
