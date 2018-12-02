@@ -8,6 +8,10 @@ import { UnlimitedAllowanceToken } from "./UnlimitedAllowanceToken.sol";
 /**
  * @title VirtualAugurShare
  * @author Veil
+ *
+ * WETH-like token that wraps Augur ERC-20 shares and comes pre-approved for trading on 0x
+ * The default spender is set to the 0x ERC20 Proxy contract to give unlimited allowance
+ * without the need to unlock tokens. The underlying Augur ERC-20 share can be redeemed any time.
  */
 contract VirtualAugurShare is UnlimitedAllowanceToken {
   using SafeMath for uint256;
@@ -30,6 +34,12 @@ contract VirtualAugurShare is UnlimitedAllowanceToken {
 
   /* ============ Constructor ============ */
 
+  /**
+   * Constructor function for VirtualAugurShare token
+   *
+   * @param _token            Underlying ERC-20 token address to wrap
+   * @param _defaultSpender   This address will have unlimited allowance by default
+   */
   constructor(address _token, address _defaultSpender) public {
     require(_token != address(0), "Invalid token address");
     require(_defaultSpender != address(0), "Invalid defaultSpender address");
@@ -47,20 +57,39 @@ contract VirtualAugurShare is UnlimitedAllowanceToken {
     revert();
   }
 
-  function deposit(uint256 _amount) public {
+  /**
+   * Buys tokens with the underlying token, exchanging them 1:1 and sets the spender allowance
+   *
+   * @param _deposit          Amount of tokens to be deposited
+   * @param _spender          Spender address for the allowance
+   * @param _allowance        Allowance amount
+   */
+  function depositAndApprove(uint256 _deposit, address _spender, uint256 _allowance) public returns (bool) {
+    deposit(_deposit);
+    approve(_spender, _allowance);
+    return true;
+  }
+
+  /**
+   * Buys tokens with the underlying token, exchanging them 1:1
+   *
+   * @param _amount          Amount of tokens to be deposited
+   */
+  function deposit(uint256 _amount) public returns (bool) {
     require(IERC20(token).transferFrom(msg.sender, address(this), _amount));
 
     balances[msg.sender] = balances[msg.sender].add(_amount);
     totalSupply = totalSupply.add(_amount);
     emit Deposit(msg.sender, _amount);
+    return true;
   }
 
-  function depositAndApprove(address _spender, uint256 _deposit, uint256 _allowance) public {
-    deposit(_deposit);
-    approve(_spender, _allowance);
-  }
-
-  function withdraw(uint256 _amount) public {
+  /**
+   * Buys tokens with the underlying token, exchanging them 1:1
+   *
+   * @param _amount          Amount of tokens to be deposited
+   */
+  function withdraw(uint256 _amount) public returns (bool) {
     require(balances[msg.sender] >= _amount, "Insufficient user balance");
 
     balances[msg.sender] = balances[msg.sender].sub(_amount);
@@ -68,8 +97,15 @@ contract VirtualAugurShare is UnlimitedAllowanceToken {
     require(IERC20(token).transfer(msg.sender, _amount));
 
     emit Withdrawal(msg.sender, _amount);
+    return true;
   }
 
+  /**
+   * Updates the standard allowance method to return unlimited allowance for the default spender
+   *
+   * @param _owner           Address that owns the funds
+   * @param _spender         Address that will spend the funds
+   */
   function allowance(address _owner, address _spender) public view returns (uint256) {
     if (_spender == defaultSpender) return uint256(-1);
     return allowed[_owner][_spender];

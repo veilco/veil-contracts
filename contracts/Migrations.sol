@@ -3,26 +3,28 @@ pragma solidity 0.4.24;
 
 /**
  * @title Migrations
- * @dev Standard migration file provided by Truffle
+ * @author Veil
+ *
+ * Standard migration file provided by Truffle
  */
 contract Migrations {
   address public owner;
   uint public lastCompletedMigration;
 
-  // CONSTRUCTOR
+  /* ============ Constructor ============ */
 
   constructor () public {
     owner = msg.sender;
   }
 
-  // MODIFIERS
+  /* ============ Modifiers ============ */
 
   modifier restricted() {
     if (msg.sender == owner)
       _;
   }
 
-  // PUBLIC FUNCTIONS
+  /* ============ Public functions ============ */
 
   function setCompleted(uint completed) public restricted {
     lastCompletedMigration = completed;

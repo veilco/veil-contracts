@@ -7,6 +7,8 @@ import { UnlimitedAllowanceToken } from "./UnlimitedAllowanceToken.sol";
 /**
  * @title VeilEther
  * @author Veil
+ *
+ * WETH-like token with the ability to deposit ETH and approve in a single transaction
  */
 contract VeilEther is UnlimitedAllowanceToken {
   using SafeMath for uint256;
@@ -35,28 +37,27 @@ contract VeilEther is UnlimitedAllowanceToken {
     deposit();
   }
 
-  function deposit() public payable {
-    balances[msg.sender] = balances[msg.sender].add(msg.value);
-    totalSupply = totalSupply.add(msg.value);
-    emit Deposit(msg.sender, msg.value);
-  }
+  /* ============ New functionality ============ */
 
-  function depositAndApprove(address _spender, uint256 _amount) public payable {
+  /**
+   * Buys tokens with Ether, exchanging them 1:1 and sets the spender allowance
+   *
+   * @param _spender          Spender address for the allowance
+   * @param _allowance        Allowance amount
+   */
+  function depositAndApprove(address _spender, uint256 _allowance) public payable returns (bool) {
     deposit();
-    approve(_spender, _amount);
+    approve(_spender, _allowance);
+    return true;
   }
 
-  function withdraw(uint256 _amount) public {
-    require(balances[msg.sender] >= _amount, "Insufficient user balance");
-
-    balances[msg.sender] = balances[msg.sender].sub(_amount);
-    totalSupply = totalSupply.sub(_amount);
-    msg.sender.transfer(_amount);
-
-    emit Withdrawal(msg.sender, _amount);
-  }
-
-  function withdrawAndTransfer(uint256 _amount, address _target) public {
+  /**
+   * Withdraws from msg.sender's balance and transfers to a target address instead of msg.sender
+   *
+   * @param _amount           Amount to withdraw
+   * @param _target           Address to send the withdrawn ETH
+   */
+  function withdrawAndTransfer(uint256 _amount, address _target) public returns (bool) {
     require(balances[msg.sender] >= _amount, "Insufficient user balance");
     require(_target != address(0), "Invalid target address");
 
@@ -65,5 +66,26 @@ contract VeilEther is UnlimitedAllowanceToken {
     _target.transfer(_amount);
 
     emit Withdrawal(msg.sender, _amount);
+    return true;
+  }
+
+  /* ============ Standard WETH functionality ============ */
+
+  function deposit() public payable returns (bool) {
+    balances[msg.sender] = balances[msg.sender].add(msg.value);
+    totalSupply = totalSupply.add(msg.value);
+    emit Deposit(msg.sender, msg.value);
+    return true;
+  }
+
+  function withdraw(uint256 _amount) public returns (bool) {
+    require(balances[msg.sender] >= _amount, "Insufficient user balance");
+
+    balances[msg.sender] = balances[msg.sender].sub(_amount);
+    totalSupply = totalSupply.sub(_amount);
+    msg.sender.transfer(_amount);
+
+    emit Withdrawal(msg.sender, _amount);
+    return true;
   }
 }
