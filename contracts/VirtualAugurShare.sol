@@ -19,7 +19,7 @@ contract VirtualAugurShare is UnlimitedAllowanceToken {
   /* ============ Constants ============ */
 
   string constant public name = "Virtual Augur Share"; // solium-disable-line uppercase
-  string constant public symbol = "Virtual Augur Share"; // solium-disable-line uppercase
+  string constant public symbol = "VSHARE"; // solium-disable-line uppercase
   uint256 constant public decimals = 18; // solium-disable-line uppercase
 
   /* ============ State variables ============ */

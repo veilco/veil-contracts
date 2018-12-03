@@ -16,7 +16,7 @@ contract VeilEther is UnlimitedAllowanceToken {
   /* ============ Constants ============ */
 
   string constant public name = "Veil Ether"; // solium-disable-line uppercase
-  string constant public symbol = "Veil Ether"; // solium-disable-line uppercase
+  string constant public symbol = "Veil ETH"; // solium-disable-line uppercase
   uint256 constant public decimals = 18; // solium-disable-line uppercase
 
   /* ============ Events ============ */

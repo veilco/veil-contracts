@@ -57,7 +57,7 @@ contract(
 
       it("has a symbol", async () => {
         const symbol = await token.symbol();
-        assert.equal(symbol, "Virtual Augur Share");
+        assert.equal(symbol, "VSHARE");
       });
 
       it("has 18 decimals", async () => {

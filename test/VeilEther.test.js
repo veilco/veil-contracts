@@ -27,7 +27,7 @@ contract("VeilEther", ([creator, spender, owner, randomUser]) => {
 
     it("has a symbol", async () => {
       const symbol = await token.symbol();
-      assert.equal(symbol, "Veil Ether");
+      assert.equal(symbol, "Veil ETH");
     });
 
     it("has 18 decimals", async () => {

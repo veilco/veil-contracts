@@ -23,7 +23,29 @@ contract("VirtualAugurShareFactory", ([creator, spender]) => {
   describe("create", () => {
     it("succeds", async () => {
       expectEventInTransaction(
-        await factory.create(token.address, spender),
+        await factory.create(token.address, spender, { from: creator }),
+        "TokenCreation"
+      );
+
+      const virtualToken = await factory.getVirtualToken(token.address);
+      assert.notEqual(virtualToken, constants.ZERO_ADDRESS);
+    });
+
+    it("fails if called by non-whitelisted", async () => {
+      await expectThrow(
+        factory.create(token.address, spender, { from: spender })
+      );
+    });
+
+    it("fails when non-whitelisted, then succeeds when whitelisted", async () => {
+      await expectThrow(
+        factory.create(token.address, spender, { from: spender })
+      );
+
+      await factory.whitelistAddress(spender, { from: creator });
+
+      expectEventInTransaction(
+        await factory.create(token.address, spender, { from: creator }),
         "TokenCreation"
       );
 
@@ -33,7 +55,7 @@ contract("VirtualAugurShareFactory", ([creator, spender]) => {
 
     it("if a token is already processed, returns the existing address", async () => {
       expectEventInTransaction(
-        await factory.create(token.address, spender),
+        await factory.create(token.address, spender, { from: creator }),
         "TokenCreation"
       );
 
@@ -61,7 +83,9 @@ contract("VirtualAugurShareFactory", ([creator, spender]) => {
 
     it("fails if there is a mismatch of tokens and spenders", async () => {
       await expectThrow(
-        factory.batchCreate([token.address], [spender, spender])
+        factory.batchCreate([token.address], [spender, spender], {
+          from: creator
+        })
       );
     });
   });

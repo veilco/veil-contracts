@@ -15,6 +15,7 @@ contract VirtualAugurShareFactory is Ownable {
   /* ============ State variables ============ */
   mapping (address => address) public  tokenToVirtualToken;
   mapping (address => address) public  virtualTokenToToken;
+  mapping (address => bool) public whitelisted;
 
   /* ============ Events ============ */
 
@@ -22,7 +23,22 @@ contract VirtualAugurShareFactory is Ownable {
 
   /* ============ Constructor ============ */
 
-  constructor() public { }
+  /**
+   * Constructor function that whitelists the contract creator
+   */
+  constructor() public {
+    whitelisted[msg.sender] = true;
+  }
+
+  /* ============ Modifiers ============ */
+
+  /**
+   * @dev Throws if called by any account that is not whitelisted
+   */
+  modifier onlyWhitelisted() {
+    require(whitelisted[msg.sender], "Address is not whitelisted");
+    _;
+  }
 
   /* ============ Public Functions ============ */
 
@@ -35,7 +51,7 @@ contract VirtualAugurShareFactory is Ownable {
    */
   function create(address _token, address _defaultSpender)
     public
-    onlyOwner
+    onlyWhitelisted
     returns (address)
   {
     if (tokenToVirtualToken[_token] != address(0)) return tokenToVirtualToken[_token];
@@ -55,7 +71,7 @@ contract VirtualAugurShareFactory is Ownable {
    */
   function batchCreate(address[] _tokens, address[] _defaultSpenders)
     public
-    onlyOwner
+    onlyWhitelisted
     returns (address[])
   {
     require(_tokens.length == _defaultSpenders.length, "Mismatch of token and spender counts");
@@ -66,6 +82,16 @@ contract VirtualAugurShareFactory is Ownable {
     }
 
     return virtualTokens;
+  }
+
+  /**
+   * Adds new address to the whitelist. Only callable by the owner.
+   *
+   * @param _newAddress       Address to be whitelisted
+   */
+  function whitelistAddress(address _newAddress) public onlyOwner returns (bool) {
+    whitelisted[_newAddress] = true;
+    return true;
   }
 
   /**
