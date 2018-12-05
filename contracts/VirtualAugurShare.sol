@@ -76,7 +76,7 @@ contract VirtualAugurShare is UnlimitedAllowanceToken {
    * @param _amount          Amount of tokens to be deposited
    */
   function deposit(uint256 _amount) public returns (bool) {
-    require(IERC20(token).transferFrom(msg.sender, address(this), _amount));
+    require(IERC20(token).transferFrom(msg.sender, address(this), _amount), "Token transfer unsuccessful");
 
     balances[msg.sender] = balances[msg.sender].add(_amount);
     totalSupply = totalSupply.add(_amount);

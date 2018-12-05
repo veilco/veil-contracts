@@ -88,9 +88,10 @@ contract VirtualAugurShareFactory is Ownable {
    * Adds new address to the whitelist. Only callable by the owner.
    *
    * @param _newAddress       Address to be whitelisted
+   * @param _whitelist        Boolean to see if an address is added to or removed from the list
    */
-  function whitelistAddress(address _newAddress) public onlyOwner returns (bool) {
-    whitelisted[_newAddress] = true;
+  function whitelistAddress(address _newAddress, bool _whitelist) public onlyOwner returns (bool) {
+    whitelisted[_newAddress] = _whitelist;
     return true;
   }
 

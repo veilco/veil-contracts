@@ -42,11 +42,17 @@ contract("VirtualAugurShareFactory", ([creator, spender]) => {
         factory.create(token.address, spender, { from: spender })
       );
 
-      await factory.whitelistAddress(spender, { from: creator });
+      await factory.whitelistAddress(spender, true, { from: creator });
 
       expectEventInTransaction(
         await factory.create(token.address, spender, { from: creator }),
         "TokenCreation"
+      );
+
+      await factory.whitelistAddress(spender, false, { from: creator });
+
+      await expectThrow(
+        factory.create(token.address, spender, { from: spender })
       );
 
       const virtualToken = await factory.getVirtualToken(token.address);
