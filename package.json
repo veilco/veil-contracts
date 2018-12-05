@@ -1,6 +1,6 @@
 {
   "name": "veil-contracts",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Smart contracts for Veil",
   "main": "index.js",
   "files": ["index.js", "build/**/*"],
