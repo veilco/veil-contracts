@@ -11,7 +11,7 @@ const should = require("chai")
   .use(require("chai-bignumber")(BigNumber))
   .should();
 
-contract("VirtualAugurShareFactory", ([creator, spender]) => {
+contract("VirtualAugurShareFactory", ([creator, spender, randomUser]) => {
   let factory, token;
 
   beforeEach(async () => {
@@ -21,57 +21,11 @@ contract("VirtualAugurShareFactory", ([creator, spender]) => {
   });
 
   describe("create", () => {
-    it("succeds", async () => {
+    it("succeds with random address", async () => {
       expectEventInTransaction(
-        await factory.create(token.address, spender, { from: creator }),
+        await factory.create(token.address, spender, { from: randomUser }),
         "TokenCreation"
       );
-
-      const virtualToken = await factory.getVirtualToken(token.address);
-      assert.notEqual(virtualToken, constants.ZERO_ADDRESS);
-    });
-
-    it("fails if called by non-whitelisted", async () => {
-      await expectThrow(
-        factory.create(token.address, spender, { from: spender })
-      );
-    });
-
-    it("fails when non-whitelisted, then succeeds when whitelisted", async () => {
-      await expectThrow(
-        factory.create(token.address, spender, { from: spender })
-      );
-
-      await factory.whitelistAddress(spender, true, { from: creator });
-
-      expectEventInTransaction(
-        await factory.create(token.address, spender, { from: creator }),
-        "TokenCreation"
-      );
-
-      await factory.whitelistAddress(spender, false, { from: creator });
-
-      await expectThrow(
-        factory.create(token.address, spender, { from: spender })
-      );
-
-      const virtualToken = await factory.getVirtualToken(token.address);
-      assert.notEqual(virtualToken, constants.ZERO_ADDRESS);
-    });
-
-    it("if a token is already processed, returns the existing address", async () => {
-      expectEventInTransaction(
-        await factory.create(token.address, spender, { from: creator }),
-        "TokenCreation"
-      );
-
-      const virtualToken = await factory.getVirtualToken(token.address);
-      assert.notEqual(virtualToken, constants.ZERO_ADDRESS);
-
-      await factory.create(token.address, spender);
-
-      const newToken = await factory.getVirtualToken(token.address);
-      assert.equal(virtualToken, newToken);
     });
   });
 
@@ -93,42 +47,6 @@ contract("VirtualAugurShareFactory", ([creator, spender]) => {
           from: creator
         })
       );
-    });
-  });
-
-  describe("getToken", () => {
-    it("returns the 0x0 address if the token is not used", async () => {
-      const newToken = await factory.getToken(creator);
-      assert.equal(newToken, constants.ZERO_ADDRESS);
-    });
-
-    it("returns the correct address", async () => {
-      expectEventInTransaction(
-        await factory.create(token.address, spender),
-        "TokenCreation"
-      );
-
-      const virtualToken = await factory.getVirtualToken(token.address);
-
-      const newToken = await factory.getToken(virtualToken);
-      assert.equal(newToken, token.address);
-    });
-  });
-
-  describe("getVirtualToken", () => {
-    it("returns the 0x0 address if the token is not used", async () => {
-      const newToken = await factory.getVirtualToken(token.address);
-      assert.equal(newToken, constants.ZERO_ADDRESS);
-    });
-
-    it("returns the correct address", async () => {
-      expectEventInTransaction(
-        await factory.create(token.address, spender),
-        "TokenCreation"
-      );
-
-      const newToken = await factory.getVirtualToken(token.address);
-      assert.notEqual(newToken, constants.ZERO_ADDRESS);
     });
   });
 });
