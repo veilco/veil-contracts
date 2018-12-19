@@ -1,6 +1,21 @@
 # Veil Smart Contracts
 
-## Setup
+`veil-contracts` repo includes [Veil Ether](https://github.com/veilco/veil-contracts/blob/master/contracts/VeilEther.sol) and Veil’s [Virtual Augur Shares](https://github.com/veilco/veil-contracts/blob/master/contracts/VirtualAugurShare.sol) template, two smart contracts that we’ve built to improve the experience of onboarding and trading on Veil.
+
+[VeilEther](https://etherscan.io/address/0x53b04999c1ff2d77fcdde98935bb936a67209e4c) and [VirtualAugurShareFactory](https://etherscan.io/address/0xa44772d6f9c7eae4ccfc958e2bcac80dcc2fb5b7) contracts as of [this commit](https://github.com/veilco/veil-contracts/tree/5f5d6cf3241f915495ed971d47f18d95cfa43672) are deployed on the Ethereum mainnet. 
+
+Install:
+```bash
+yarn add veil-contracts
+```
+
+## Questions?
+
+Join us on [Discord](https://discord.gg/aBfTCVU) or email us at `hello@veil.market`. If you encounter a problem using this project, feel free to [open an issue](https://github.com/veilco/veil-contracts/issues).
+
+`veil-contracts` is maintained by [@mertcelebi](https://github.com/mertcelebi), [@gkaemmer](https://github.com/gkaemmer), and [@pfletcherhill](https://github.com/pfletcherhill).
+
+## Development
 
 This repo assumes you have truffle installed globally. If you don't have it make sure you have the most recent version installed.
 
@@ -48,7 +63,7 @@ yarn run test
 
 ## Deploying to Kovan, Mainnet
 
-To deploy to Kovan or Mainnet, make sure your account (the first address derived from your MNEMONIC) has at least `0.7 ETH`, then run:
+To deploy to Kovan or Mainnet, make sure your account (the first address derived from your MNEMONIC) has at least `0.3 ETH`, then run:
 
 ```bash
 yarn run migrate:kovan
@@ -56,25 +71,19 @@ yarn run migrate:kovan
 yarn run migrate:mainnet
 ```
 
-## Notes about VeilEther
+## Notes about VeilEther and VirtualAugurShares
 
-The UX of wrapping ETH and setting an unlimited allowance for the 0x contract is bad. From the user's perspective, it is tough to understand (wrapping ETH) and scary (setting unlimited allowance). And the user needs to make two Ethereum transactions, which is slow and expensive. The goal is to create a version of WETH that is either pre-approved for trading on 0x. For this, we've considered 3 approaches.
+Veil uses [0x](https://0x.org/) to let people trade shares in Augur markets, meaning users can immediately create orders without sending Ethereum transactions. Unfortunately it requires two awkward steps before users can trade:
 
-1. Modify `transferFrom` method to create an exception for the 0x address. Similarly to checking for the unlimited allowance, the `transferFrom` method can be modified to make an exception if the spender is the 0x contract. This is problematic, because future-proofing the hard-coded 0x address is challenging.
+1. They need to wrap their ETH and approve it for trading with 0x.
+For every token they trade, they need to approve a 0x smart contract to control their balance of that token.
 
-2. Modify `deposit` method to deposit and the set unlimited allowance for the 0x contract. This runs into the same problems with future-proofing the hard-coded 0x address and is not good enough for production usage. The Kovan deployed version of Veil Ether uses this approach. Because the ABI of the contract doesn't change, integrating the contract requires no custom development.
+2. The UX of wrapping ETH and setting an unlimited allowance for the 0x contract is bad. From the user's perspective, it is tough to understand (wrapping ETH) and scary (setting unlimited allowance). And the user needs to make two Ethereum transactions, which is slow and expensive. The goal is to create a version of WETH that is either pre-approved for trading on 0x. For this, we've considered 3 approaches.
 
-3. Create a custom `depositAndApprove` method that does the same thing as point #2 without the need to hard-code the 0x address. This is probably a good enough of a solution for production use.
+From the user’s perspective, both steps are tough to understand (e.g. “why do I need to wrap my ETH?”) and scary (e.g. “am I putting 1.158e+59 shares at risk?”). And both steps require at least one Ethereum transaction, which is slow and expensive.
 
-## Notes about VirtualAugurShares
+The Veil smart contracts are designed to streamline Veil’s UX by removing the extra unlocking transaction. [Veil Ether](https://github.com/veilco/veil-contracts/blob/master/contracts/VeilEther.sol) is a fork of WETH with a custom `depositAndApprove` function that lets users deposit ETH and set an allowance in a single transaction. This means that once you’ve wrapped your ETH into Veil Ether, there’s no need to approve it for trading on 0x.
 
-Similarly, the UX of "unlocking" tokens before trading them is bad. In the context of Veil, there are 2 scenarios that require users to unlock their Augur shares (ERC-20 tokens):
+The second step, unlocking tokens, poses a bigger challenge for Augur shares. Each market on Veil (and Augur more generally) introduces at least two new ERC-20 tokens — one for each outcome. For a user to trade or redeem their shares in those new markets, they’ll need to unlock both tokens. If a user trades on 10–20 markets, then they’re faced with an additional 20–40 Ethereum transactions. Obviously, at some point this becomes untenable, and it’s a bad user experience.
 
-1. When a user wants to sell a share as part of standard market trading before market resolution
-2. When a user wants to return their shares to Veil to claim their trading proceeds after market resolution
-
-The goal is to create a token that:
-
-1. Wraps Augur shares (or any ERC-20 token for that matter)
-2. Can be used to redeem the underlying share any time
-3. Comes pre-approved for trading on 0x
+To let users skip all of these transactions, we’ve built [Virtual Augur Shares](https://github.com/veilco/veil-contracts/blob/master/contracts/VirtualAugurShare.sol), a template for ERC-20 tokens that wrap Augur shares and approve them for trading on 0x. Each Virtual Augur Share is redeemable for a share in a specific Augur token, just like WETH is redeemable for ETH. And by default Virtual Augur Shares are pre-approved for trading on 0x, so users do not have to submit a second approve transaction.
