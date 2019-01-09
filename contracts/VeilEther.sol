@@ -52,6 +52,17 @@ contract VeilEther is UnlimitedAllowanceToken {
   }
 
   /**
+   * Buys tokens with Ether, exchanging them 1:1, and transfers them to a target address instead of msg.sender
+   *
+   * @param _target           Address to send the tokens
+   */
+  function depositAndTransfer(address _target) public payable returns (bool) {
+    deposit();
+    transfer(_target, msg.value);
+    return true;
+  }
+
+  /**
    * Withdraws from msg.sender's balance and transfers to a target address instead of msg.sender
    *
    * @param _amount           Amount to withdraw
