@@ -201,5 +201,63 @@ contract(
         );
       });
     });
+
+    describe("depositAndTransfer", () => {
+      it("fails if the allowance of the original token is 0", async () => {
+        const initialBalance = await mintableToken.balanceOf(randomUser);
+        initialBalance.should.be.bignumber.equal(0);
+
+        await expectEventInTransaction(
+          mintableToken.mint(randomUser, toWei(1), {
+            from: creator
+          }),
+          "Transfer"
+        );
+        const newBalance = await mintableToken.balanceOf(randomUser);
+        newBalance.should.be.bignumber.equal(toWei(1));
+
+        await expectThrow(
+          token.depositAndTransfer(toWei(1), spender, {
+            from: randomUser
+          })
+        );
+      });
+
+      it("fails if the user doesn't have enough of the original token", async () => {
+        const initialBalance = await mintableToken.balanceOf(randomUser);
+        initialBalance.should.be.bignumber.equal(0);
+
+        await mintAndApproveToken(token, mintableToken, creator, randomUser);
+
+        await expectThrow(
+          token.depositAndTransfer(toWei(2), spender, {
+            from: randomUser
+          })
+        );
+      });
+
+      it("succeeds if deposit is successful", async () => {
+        const initialBalance = await mintableToken.balanceOf(randomUser);
+        initialBalance.should.be.bignumber.equal(0);
+
+        const initialTokenBalanceSpender = await token.balanceOf(spender);
+        initialTokenBalanceSpender.should.be.bignumber.equal(0);
+
+        await mintAndApproveToken(token, mintableToken, creator, randomUser);
+
+        await expectEventInTransaction(
+          token.depositAndTransfer(toWei(1), spender, {
+            from: randomUser
+          }),
+          "Deposit"
+        );
+
+        const finalBalance = await mintableToken.balanceOf(randomUser);
+        finalBalance.should.be.bignumber.equal(0);
+
+        const finalTokenBalanceSpender = await token.balanceOf(spender);
+        finalTokenBalanceSpender.should.be.bignumber.equal(toWei(1));
+      });
+    });
   }
 );
