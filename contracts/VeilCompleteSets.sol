@@ -45,7 +45,7 @@ contract IMarket {
  * @title VeilCompleteSets
  * @author Veil
  *
- * Simple contract to wrap the process of depositing Cash to Augur, buying complete sets
+ * Simple utility contract to simplify the process of depositing Cash to Augur, buying complete sets
  * from Augur, wrapping the complete sets in Virtual Augur Shares and transferring to msg.sender.
  *
  * This contract is stateless, never holds funds, and can be swapped with another contract any time.
@@ -107,11 +107,8 @@ contract VeilCompleteSets {
     VirtualAugurShare virtualLong = VirtualAugurShare(_virtualLongToken);
     VirtualAugurShare virtualShort = VirtualAugurShare(_virtualShortToken);
 
-    // The next version of this will use depositAndTransfer
-    require(virtualLong.deposit(_amount), "VAS Long deposit failed");
-    require(virtualShort.deposit(_amount), "VAS Short deposit failed");
-    require(virtualLong.transfer(msg.sender, _amount), "VAS Long transfer failed");
-    require(virtualShort.transfer(msg.sender, _amount), "VAS Long transfer failed");
+    require(virtualLong.depositAndTransfer(_amount, msg.sender), "VAS Long deposit and transfer failed");
+    require(virtualShort.depositAndTransfer(_amount, msg.sender), "VAS Short deposit and transfer failed");
 
     emit VeilBuyCompleteSets(msg.sender, _amount);
     return true;
