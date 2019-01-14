@@ -14,7 +14,7 @@ contract MintableTokenMock is UnlimitedAllowanceToken {
   constructor () public { }
 
   function mint(address _to, uint256 _value) public returns (bool) {
-    require(_to != address(0));
+    require(_to != address(0), "Invalid address");
 
     totalSupply = totalSupply.add(_value);
     balances[_to] = balances[_to].add(_value);

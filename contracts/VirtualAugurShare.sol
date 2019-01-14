@@ -54,7 +54,7 @@ contract VirtualAugurShare is UnlimitedAllowanceToken {
    * @dev Fallback function
    */
   function() public {
-    revert();
+    revert("Fallback function reverts");
   }
 
   /**
@@ -67,6 +67,19 @@ contract VirtualAugurShare is UnlimitedAllowanceToken {
   function depositAndApprove(uint256 _deposit, address _spender, uint256 _allowance) public returns (bool) {
     deposit(_deposit);
     approve(_spender, _allowance);
+    return true;
+  }
+
+  /**
+   * Buys tokens with the underlying token, exchanging them 1:1, and transfers them to a target
+   * address instead of msg.sender
+   *
+   * @param _amount           Amount of tokens to be deposited
+   * @param _target           Address to send the tokens
+   */
+  function depositAndTransfer(uint256 _amount, address _target) public returns (bool) {
+    deposit(_amount);
+    transfer(_target, _amount);
     return true;
   }
 
@@ -94,7 +107,7 @@ contract VirtualAugurShare is UnlimitedAllowanceToken {
 
     balances[msg.sender] = balances[msg.sender].sub(_amount);
     totalSupply = totalSupply.sub(_amount);
-    require(IERC20(token).transfer(msg.sender, _amount));
+    require(IERC20(token).transfer(msg.sender, _amount), "Token transfer failed");
 
     emit Withdrawal(msg.sender, _amount);
     return true;
@@ -107,7 +120,8 @@ contract VirtualAugurShare is UnlimitedAllowanceToken {
    * @param _spender         Address that will spend the funds
    */
   function allowance(address _owner, address _spender) public view returns (uint256) {
-    if (_spender == defaultSpender) return uint256(-1);
+    if (_spender == defaultSpender)
+      return uint256(-1);
     return allowed[_owner][_spender];
   }
 }
