@@ -1,9 +1,9 @@
 {
   "name": "veil-contracts",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Smart contracts for Veil",
   "main": "index.js",
-  "files": ["index.js", "build/**/*"],
+  "files": ["index.js", "build/**/*", "contracts/**/*"],
   "scripts": {
     "test": "truffle test",
     "lint": "solium --dir ./contracts",
