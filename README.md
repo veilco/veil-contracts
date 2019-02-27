@@ -2,9 +2,10 @@
 
 `veil-contracts` repo includes [Veil Ether](https://github.com/veilco/veil-contracts/blob/master/contracts/VeilEther.sol) and Veil’s [Virtual Augur Shares](https://github.com/veilco/veil-contracts/blob/master/contracts/VirtualAugurShare.sol) template, two smart contracts that we’ve built to improve the experience of onboarding and trading on Veil.
 
-VeilEther as of commit [5f5d6cf3241f915495ed971d47f18d95cfa43672](https://github.com/veilco/veil-contracts/tree/5f5d6cf3241f915495ed971d47f18d95cfa43672) is deployed at [0x53b04999c1ff2d77fcdde98935bb936a67209e4c](https://etherscan.io/address/0x53b04999c1ff2d77fcdde98935bb936a67209e4c). VirtualAugurShareFactory as of commit [0e2356bbf156d73a8efab3157322f7034a47f7be](https://github.com/veilco/veil-contracts/tree/0e2356bbf156d73a8efab3157322f7034a47f7be) is deployed at [0xcb662b5b0890c6d2de97dcd19117fa9e30a8e211](https://etherscan.io/address/0xcb662b5b0890c6d2de97dcd19117fa9e30a8e211).
+VeilEther as of commit [5f5d6cf3241f915495ed971d47f18d95cfa43672](https://github.com/veilco/veil-contracts/tree/5f5d6cf3241f915495ed971d47f18d95cfa43672) is deployed at [0x53b04999c1ff2d77fcdde98935bb936a67209e4c](https://etherscan.io/address/0x53b04999c1ff2d77fcdde98935bb936a67209e4c). VirtualAugurShareFactory as of commit [97be1e2334df2475669cf481333486c4d29eaedb](https://github.com/veilco/veil-contracts/tree/97be1e2334df2475669cf481333486c4d29eaedb) is deployed at [0x94888179c352fdf7fbfbdf436651e516c83cfe37](https://etherscan.io/address/0x94888179c352fdf7fbfbdf436651e516c83cfe37).
 
 Install:
+
 ```bash
 yarn add veil-contracts
 ```
@@ -76,7 +77,7 @@ yarn run migrate:mainnet
 Veil uses [0x](https://0x.org/) to let people trade shares in Augur markets, meaning users can immediately create orders without sending Ethereum transactions. Unfortunately it requires two awkward steps before users can trade:
 
 1. They need to wrap their ETH and approve it for trading with 0x.
-For every token they trade, they need to approve a 0x smart contract to control their balance of that token.
+   For every token they trade, they need to approve a 0x smart contract to control their balance of that token.
 
 2. The UX of wrapping ETH and setting an unlimited allowance for the 0x contract is bad. From the user's perspective, it is tough to understand (wrapping ETH) and scary (setting unlimited allowance). And the user needs to make two Ethereum transactions, which is slow and expensive. The goal is to create a version of WETH that is either pre-approved for trading on 0x. For this, we've considered 3 approaches.
 
