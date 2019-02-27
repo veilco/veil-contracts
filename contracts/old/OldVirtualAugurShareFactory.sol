@@ -1,15 +1,15 @@
 pragma solidity 0.4.24;
 
-import { VirtualAugurShare } from "./VirtualAugurShare.sol";
+import { OldVirtualAugurShare } from "./OldVirtualAugurShare.sol";
 
 
 /**
- * @title VirtualAugurShareFactory
+ * @title OldVirtualAugurShareFactory
  * @author Veil
  *
- * Token factory that creates new VirtualAugurShares
+ * Token factory that creates new OldVirtualAugurShares
  */
-contract VirtualAugurShareFactory {
+contract OldVirtualAugurShareFactory {
 
   /* ============ Events ============ */
 
@@ -22,15 +22,13 @@ contract VirtualAugurShareFactory {
   /* ============ Public Functions ============ */
 
   /**
-   * For a given token address and a default spender, creates a VirtualAugurShare and transfers
-   * the ownership of the VirtualAugurShare to msg.sender
+   * For a given token address and a default spender, creates a OldVirtualAugurShare
    *
    * @param _token            Underlying ERC-20 token address to wrap
    * @param _defaultSpender   This address will have unlimited allowance by default
    */
   function create(address _token, address _defaultSpender) public returns (address) {
-    address virtualToken = new VirtualAugurShare(_token, _defaultSpender);
-    VirtualAugurShare(virtualToken).transferOwnership(msg.sender);
+    address virtualToken = new OldVirtualAugurShare(_token, _defaultSpender);
 
     emit TokenCreation(_token, virtualToken, _defaultSpender);
     return virtualToken;

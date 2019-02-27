@@ -4,49 +4,36 @@ import { constants } from "./utils/constants";
 import { advanceBlock } from "./utils/advanceToBlock";
 
 const VirtualAugurShareFactory = artifacts.require("VirtualAugurShareFactory");
-const MintableTokenMock = artifacts.require("MintableTokenMock");
+const VirtualAugurShare = artifacts.require("VirtualAugurShare");
 const BigNumber = web3.BigNumber;
 const should = require("chai")
   .use(require("chai-as-promised"))
   .use(require("chai-bignumber")(BigNumber))
   .should();
 
-contract("VirtualAugurShareFactory", ([creator, spender, randomUser]) => {
-  let factory, token;
+contract("VirtualAugurShareFactory", ([creator, spender]) => {
+  let factory;
 
   beforeEach(async () => {
-    token = await MintableTokenMock.new({ from: creator });
     factory = await VirtualAugurShareFactory.new({ from: creator });
     await advanceBlock();
   });
 
   describe("create", () => {
-    it("succeds with random address", async () => {
-      expectEventInTransaction(
-        await factory.create(token.address, spender, { from: randomUser }),
-        "TokenCreation"
-      );
-    });
-  });
+    it("transfers ownership of the VirtualAugurShare to the msg.sender", async () => {
+      const txn = await factory.create(constants.ZERO_ADDRESS, spender, {
+        from: creator
+      });
 
-  describe("batchCreate", () => {
-    it("succeds", async () => {
-      const token2 = await MintableTokenMock.new({ from: creator });
-      expectEventInTransaction(
-        await factory.batchCreate(
-          [token.address, token2.address],
-          [spender, spender]
-        ),
-        "TokenCreation"
-      );
-    });
+      expectEventInTransaction(txn, "TokenCreation");
 
-    it("fails if there is a mismatch of tokens and spenders", async () => {
-      await expectThrow(
-        factory.batchCreate([token.address], [spender, spender], {
-          from: creator
-        })
-      );
+      const event = txn.logs.find(e => e.event === "TokenCreation");
+      const virtualTokenAddress = event.args.virtualToken;
+      const tokenOwner = await VirtualAugurShare.at(
+        virtualTokenAddress
+      ).owner();
+
+      assert.equal(tokenOwner, creator);
     });
   });
 });
