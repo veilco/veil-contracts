@@ -2,19 +2,18 @@ pragma solidity 0.4.24;
 
 import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
-import { Ownable } from "openzeppelin-solidity/contracts/ownership/Ownable.sol";
-import { UnlimitedAllowanceToken } from "./UnlimitedAllowanceToken.sol";
+import { UnlimitedAllowanceToken } from "../UnlimitedAllowanceToken.sol";
 
 
 /**
- * @title OwnableVirtualAugurShare
+ * @title OldVirtualAugurShare
  * @author Veil
  *
  * WETH-like token that wraps Augur ERC-20 shares and comes pre-approved for trading on 0x
  * The default spender is set to the 0x ERC20 Proxy contract to give unlimited allowance
  * without the need to unlock tokens. The underlying Augur ERC-20 share can be redeemed any time.
  */
-contract OwnableVirtualAugurShare is UnlimitedAllowanceToken, Ownable {
+contract OldVirtualAugurShare is UnlimitedAllowanceToken {
   using SafeMath for uint256;
 
   /* ============ Constants ============ */
@@ -32,17 +31,17 @@ contract OwnableVirtualAugurShare is UnlimitedAllowanceToken, Ownable {
 
   event Deposit(address indexed dest, uint256 amount);
   event Withdrawal(address indexed src, uint256 amount);
-  event SetToken(address indexed token);
 
   /* ============ Constructor ============ */
 
   /**
-   * Constructor function for VirtualAugurShare token
+   * Constructor function for OldVirtualAugurShare token
    *
    * @param _token            Underlying ERC-20 token address to wrap
    * @param _defaultSpender   This address will have unlimited allowance by default
    */
   constructor(address _token, address _defaultSpender) public {
+    require(_token != address(0), "Invalid token address");
     require(_defaultSpender != address(0), "Invalid defaultSpender address");
 
     token = _token;
@@ -58,22 +57,6 @@ contract OwnableVirtualAugurShare is UnlimitedAllowanceToken, Ownable {
     revert("Fallback function reverts");
   }
 
-  modifier whenTokenIsSet {
-    require(token != address(0), "Underlying token is not set");
-    _;
-  }
-
-  modifier whenTokenIsNotSet {
-    require(token == address(0), "Underlying token is already set");
-    _;
-  }
-
-  function setToken(address _token) public onlyOwner whenTokenIsNotSet returns (bool) {
-    token = _token;
-    emit SetToken(_token);
-    return true;
-  }
-
   /**
    * Buys tokens with the underlying token, exchanging them 1:1 and sets the spender allowance
    *
@@ -81,11 +64,7 @@ contract OwnableVirtualAugurShare is UnlimitedAllowanceToken, Ownable {
    * @param _spender          Spender address for the allowance
    * @param _allowance        Allowance amount
    */
-  function depositAndApprove(uint256 _deposit, address _spender, uint256 _allowance)
-    public
-    whenTokenIsSet
-    returns (bool)
-  {
+  function depositAndApprove(uint256 _deposit, address _spender, uint256 _allowance) public returns (bool) {
     deposit(_deposit);
     approve(_spender, _allowance);
     return true;
@@ -98,11 +77,7 @@ contract OwnableVirtualAugurShare is UnlimitedAllowanceToken, Ownable {
    * @param _amount           Amount of tokens to be deposited
    * @param _target           Address to send the tokens
    */
-  function depositAndTransfer(uint256 _amount, address _target)
-    public
-    whenTokenIsSet
-    returns (bool)
-  {
+  function depositAndTransfer(uint256 _amount, address _target) public returns (bool) {
     deposit(_amount);
     transfer(_target, _amount);
     return true;
@@ -113,7 +88,7 @@ contract OwnableVirtualAugurShare is UnlimitedAllowanceToken, Ownable {
    *
    * @param _amount          Amount of tokens to be deposited
    */
-  function deposit(uint256 _amount) public whenTokenIsSet returns (bool) {
+  function deposit(uint256 _amount) public returns (bool) {
     require(IERC20(token).transferFrom(msg.sender, address(this), _amount), "Token transfer unsuccessful");
 
     balances[msg.sender] = balances[msg.sender].add(_amount);
@@ -127,7 +102,7 @@ contract OwnableVirtualAugurShare is UnlimitedAllowanceToken, Ownable {
    *
    * @param _amount          Amount of tokens to be deposited
    */
-  function withdraw(uint256 _amount) public whenTokenIsSet returns (bool) {
+  function withdraw(uint256 _amount) public returns (bool) {
     require(balances[msg.sender] >= _amount, "Insufficient user balance");
 
     balances[msg.sender] = balances[msg.sender].sub(_amount);

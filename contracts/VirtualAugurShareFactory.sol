@@ -22,13 +22,15 @@ contract VirtualAugurShareFactory {
   /* ============ Public Functions ============ */
 
   /**
-   * For a given token address and a default spender, creates a VirtualAugurShare
+   * For a given token address and a default spender, creates a VirtualAugurShare and transfers
+   * the ownership of the VirtualAugurShare to msg.sender
    *
    * @param _token            Underlying ERC-20 token address to wrap
    * @param _defaultSpender   This address will have unlimited allowance by default
    */
   function create(address _token, address _defaultSpender) public returns (address) {
     address virtualToken = new VirtualAugurShare(_token, _defaultSpender);
+    VirtualAugurShare(virtualToken).transferOwnership(msg.sender);
 
     emit TokenCreation(_token, virtualToken, _defaultSpender);
     return virtualToken;
