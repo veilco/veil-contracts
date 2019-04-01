@@ -57,7 +57,7 @@ contract VeilEther is UnlimitedAllowanceToken {
    * @param _amount           Amount to withdraw
    * @param _target           Address to send the withdrawn ETH
    */
-  function withdrawAndTransfer(uint256 _amount, address _target) public returns (bool) {
+  function withdrawAndTransfer(uint256 _amount, address payable _target) public returns (bool) {
     require(balances[msg.sender] >= _amount, "Insufficient user balance");
     require(_target != address(0), "Invalid target address");
 
