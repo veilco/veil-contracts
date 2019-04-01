@@ -62,7 +62,7 @@ contract VeilEther is UnlimitedAllowanceToken {
     require(_target != address(0), "Invalid target address");
 
     balances[msg.sender] = balances[msg.sender].sub(_amount);
-    totalSupply = totalSupply.sub(_amount);
+    //totalSupply = totalSupply.sub(_amount);
     _target.transfer(_amount);
 
     emit Withdrawal(msg.sender, _amount);
@@ -73,7 +73,7 @@ contract VeilEther is UnlimitedAllowanceToken {
 
   function deposit() public payable returns (bool) {
     balances[msg.sender] = balances[msg.sender].add(msg.value);
-    totalSupply = totalSupply.add(msg.value);
+    //totalSupply = totalSupply.add(msg.value);
     emit Deposit(msg.sender, msg.value);
     return true;
   }
@@ -82,7 +82,7 @@ contract VeilEther is UnlimitedAllowanceToken {
     require(balances[msg.sender] >= _amount, "Insufficient user balance");
 
     balances[msg.sender] = balances[msg.sender].sub(_amount);
-    totalSupply = totalSupply.sub(_amount);
+    //totalSupply = totalSupply.sub(_amount);
     msg.sender.transfer(_amount);
 
     emit Withdrawal(msg.sender, _amount);

@@ -128,7 +128,7 @@ contract VirtualAugurShare is UnlimitedAllowanceToken, Ownable {
     require(IERC20(token).transferFrom(msg.sender, address(this), _amount), "Token transfer unsuccessful");
 
     balances[msg.sender] = balances[msg.sender].add(_amount);
-    totalSupply = totalSupply.add(_amount);
+    //totalSupply = totalSupply.add(_amount);
     emit Deposit(msg.sender, _amount);
     return true;
   }
@@ -143,7 +143,7 @@ contract VirtualAugurShare is UnlimitedAllowanceToken, Ownable {
     require(balances[msg.sender] >= _amount, "Insufficient user balance");
 
     balances[msg.sender] = balances[msg.sender].sub(_amount);
-    totalSupply = totalSupply.sub(_amount);
+    //totalSupply = totalSupply.sub(_amount);
     require(IERC20(token).transfer(msg.sender, _amount), "Token transfer failed");
 
     emit Withdrawal(msg.sender, _amount);
