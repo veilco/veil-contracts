@@ -16,4 +16,5 @@ while [ "$1" != "" ]; do
   shift
 done
 
-ganache-cli -b 1 -l 300000000 -p $PORT -e 100000 --mnemonic "almost nasty switch remind embark holiday seminar decline space unable all evil"
+ganache-cli -b 1 -l 300000000 -p $PORT -a 10 -e 100000 --account 0xa66195e41058b11e278a65c0e811944857c08d78d618e1fffdcc98cf3e9cec5a,100000000000000 0xa66195e41058b11e278a65c0e811944857c08d78d618e1fffdcc99cf3e9cec5a,1000000000000000000000
+

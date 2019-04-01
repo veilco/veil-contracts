@@ -1,6 +1,7 @@
 pragma solidity 0.4.24;
 
 import { VirtualAugurShare } from "./VirtualAugurShare.sol";
+import { CloneFactory } from "./CloneFactory.sol";
 
 
 /**
@@ -9,7 +10,7 @@ import { VirtualAugurShare } from "./VirtualAugurShare.sol";
  *
  * Token factory that creates new VirtualAugurShares
  */
-contract VirtualAugurShareFactory {
+contract VirtualAugurShareFactory is CloneFactory {
 
   /* ============ Events ============ */
 
@@ -29,8 +30,10 @@ contract VirtualAugurShareFactory {
    * @param _defaultSpender   This address will have unlimited allowance by default
    */
   function create(address _token, address _defaultSpender) public returns (address) {
-    address virtualToken = new VirtualAugurShare(_token, _defaultSpender);
+    address virtualToken = createClone(address(0))//this is the address of the deployed VirtualAugurShare contract ~~~~~~replace with new value on main net~~~~~~
     VirtualAugurShare(virtualToken).transferOwnership(msg.sender);
+    require(VirtualAugurShare(virtualToken).setToken(_token));
+    require(VirtualAugurShare(virtualToken).setDefaultSpender(_defaultSpender));
 
     emit TokenCreation(_token, virtualToken, _defaultSpender);
     return virtualToken;

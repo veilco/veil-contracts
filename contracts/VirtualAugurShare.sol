@@ -36,21 +36,6 @@ contract VirtualAugurShare is UnlimitedAllowanceToken, Ownable {
   event Withdrawal(address indexed src, uint256 amount);
   event SetToken(address indexed token);
 
-  /* ============ Constructor ============ */
-
-  /**
-   * Constructor function for VirtualAugurShare token
-   *
-   * @param _token            Underlying ERC-20 token address to wrap
-   * @param _defaultSpender   This address will have unlimited allowance by default
-   */
-  constructor(address _token, address _defaultSpender) public {
-    require(_defaultSpender != address(0), "Invalid defaultSpender address");
-
-    token = _token;
-    defaultSpender = _defaultSpender;
-  }
-
   /* ============ Public Functions ============ */
 
   /**
@@ -70,6 +55,11 @@ contract VirtualAugurShare is UnlimitedAllowanceToken, Ownable {
     _;
   }
 
+  modifier whenDefaultSpenderIsNotSet {
+    require(defaultSpender == address(0), "Default spender is already set");
+    _;
+  }
+
   /**
    * Sets the underlying ERC-20 token of the VirtualAugurShare. Only callable by the owner when
    * when the token is not address(0)
@@ -79,6 +69,17 @@ contract VirtualAugurShare is UnlimitedAllowanceToken, Ownable {
   function setToken(address _token) public onlyOwner whenTokenIsNotSet returns (bool) {
     token = _token;
     emit SetToken(_token);
+    return true;
+  }
+
+  /**
+   * Sets the default spender (0x contract) of the VirtualAugurShare. Only callable by the owner when
+   * when the default spender is not address(0)
+   *
+   * @param _defaultSpender            default spender address (0x contract)
+   */
+  function setDefaultSpender(address _defaultSpender) public onlyOwner whenDefaultSpenderIsNotSet returns (bool) {
+    defaultSpender = _defaultSpender;
     return true;
   }
 
