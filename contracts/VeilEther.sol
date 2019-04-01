@@ -33,7 +33,7 @@ contract VeilEther is UnlimitedAllowanceToken {
   /**
    * @dev Fallback function can be used to buy tokens by proxying the call to deposit()
    */
-  function() public payable {
+  function() external payable {
     deposit();
   }
 

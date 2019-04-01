@@ -64,7 +64,7 @@ contract VeilCompleteSets {
   /**
    * @dev Fallback function
    */
-  function() public {
+  function() external {
     revert("Fallback function reverts");
   }
 

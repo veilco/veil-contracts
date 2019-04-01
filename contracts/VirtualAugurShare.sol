@@ -41,7 +41,7 @@ contract VirtualAugurShare is UnlimitedAllowanceToken, Ownable {
   /**
    * @dev Fallback function
    */
-  function() public {
+  function() external {
     revert("Fallback function reverts");
   }
 
