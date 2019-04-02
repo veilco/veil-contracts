@@ -72,7 +72,7 @@ contract VirtualAugurShare is UnlimitedAllowanceToken, Ownable {
 
   /**
    * Sets the underlying ERC-20 token of the VirtualAugurShare. Only callable by the owner when
-   * when the token is not address(0)
+   * when the token address(0)
    *
    * @param _token            Underlying ERC-20 token address to wrap
    */
