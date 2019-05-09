@@ -1,6 +1,7 @@
-pragma solidity 0.4.24;
+pragma solidity >=0.4.24;
 
 import { VirtualAugurShare } from "./VirtualAugurShare.sol";
+import { CloneFactory16 } from "./CloneFactory16.sol";
 
 
 /**
@@ -9,7 +10,7 @@ import { VirtualAugurShare } from "./VirtualAugurShare.sol";
  *
  * Token factory that creates new VirtualAugurShares
  */
-contract VirtualAugurShareFactory {
+contract VirtualAugurShareFactory is CloneFactory16 {
 
   /* ============ Events ============ */
 
@@ -29,8 +30,10 @@ contract VirtualAugurShareFactory {
    * @param _defaultSpender   This address will have unlimited allowance by default
    */
   function create(address _token, address _defaultSpender) public returns (address) {
-    address virtualToken = new VirtualAugurShare(_token, _defaultSpender);
+    address virtualToken = createClone(address(0x00004a7b379d528BB7CC9A9071E2754966463FEd));//this is the address of the deployed VirtualAugurShare contract ~~~~~~replace with new value on main net~~~~~~
     VirtualAugurShare(virtualToken).transferOwnership(msg.sender);
+    require(VirtualAugurShare(virtualToken).setToken(_token));
+    require(VirtualAugurShare(virtualToken).setDefaultSpender(_defaultSpender));
 
     emit TokenCreation(_token, virtualToken, _defaultSpender);
     return virtualToken;
@@ -42,7 +45,7 @@ contract VirtualAugurShareFactory {
    * @param _tokens           Array of underlying ERC-20 token address to wrap
    * @param _defaultSpenders  Array of addresses that will have unlimited allowance by default
    */
-  function batchCreate(address[] _tokens, address[] _defaultSpenders) public returns (address[]) {
+  function batchCreate(address[] memory _tokens, address[] memory _defaultSpenders) public returns (address[] memory) {
     require(_tokens.length == _defaultSpenders.length, "Mismatch of token and spender counts");
 
     address[] memory virtualTokens = new address[](_tokens.length);

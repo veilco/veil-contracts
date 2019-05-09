@@ -1,4 +1,4 @@
-pragma solidity 0.4.24;
+pragma solidity >=0.4.24;
 
 import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import { UnlimitedAllowanceToken } from "./UnlimitedAllowanceToken.sol";
@@ -33,7 +33,7 @@ contract VeilEther is UnlimitedAllowanceToken {
   /**
    * @dev Fallback function can be used to buy tokens by proxying the call to deposit()
    */
-  function() public payable {
+  function() external payable {
     deposit();
   }
 
@@ -57,7 +57,7 @@ contract VeilEther is UnlimitedAllowanceToken {
    * @param _amount           Amount to withdraw
    * @param _target           Address to send the withdrawn ETH
    */
-  function withdrawAndTransfer(uint256 _amount, address _target) public returns (bool) {
+  function withdrawAndTransfer(uint256 _amount, address payable _target) public returns (bool) {
     require(balances[msg.sender] >= _amount, "Insufficient user balance");
     require(_target != address(0), "Invalid target address");
 

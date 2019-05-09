@@ -1,4 +1,4 @@
-pragma solidity 0.4.24;
+pragma solidity >=0.4.24;
 
 import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
 import { VirtualAugurShare } from "./VirtualAugurShare.sol";
@@ -64,7 +64,7 @@ contract VeilCompleteSets {
   /**
    * @dev Fallback function
    */
-  function() public {
+  function() external {
     revert("Fallback function reverts");
   }
 
@@ -85,7 +85,7 @@ contract VeilCompleteSets {
     require(_amount.mul(IMarket(_augurMarket).getNumTicks()) == msg.value, "Msg.value is incorrect");
 
     // Deposit Cash and buy complete sets
-    if (ICash(_augurCash).allowance(this, _augurContract) != uint256(-1)) {
+    if (ICash(_augurCash).allowance(address(this), _augurContract) != uint256(-1)) {
       require(ICash(_augurCash).approve(_augurContract, uint256(-1)), "Cash approval failed");
     }
     ICash(_augurCash).depositEther.value(msg.value)();
@@ -95,11 +95,11 @@ contract VeilCompleteSets {
     IERC20 augurLongToken = IERC20(IMarket(_augurMarket).getShareToken(1));
     IERC20 augurShortToken = IERC20(IMarket(_augurMarket).getShareToken(0));
 
-    if (augurLongToken.allowance(this, _virtualLongToken) != uint256(-1)) {
+    if (augurLongToken.allowance(address(this), _virtualLongToken) != uint256(-1)) {
       require(augurLongToken.approve(_virtualLongToken, uint256(-1)), "Long approval failed");
     }
 
-    if (augurShortToken.allowance(this, _virtualShortToken) != uint256(-1)) {
+    if (augurShortToken.allowance(address(this), _virtualShortToken) != uint256(-1)) {
       require(augurShortToken.approve(_virtualShortToken, uint256(-1)), "Short approval failed");
     }
 

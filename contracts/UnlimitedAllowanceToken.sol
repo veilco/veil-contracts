@@ -1,4 +1,4 @@
-pragma solidity 0.4.24;
+pragma solidity >=0.4.24;
 
 import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import { IERC20 } from "openzeppelin-solidity/contracts/token/ERC20/IERC20.sol";
@@ -17,7 +17,7 @@ contract UnlimitedAllowanceToken is IERC20 {
 
   /* ============ State variables ============ */
 
-  uint256 public totalSupply;
+  uint256 public supply;
   mapping (address => uint256) public  balances;
   mapping (address => mapping (address => uint256)) public allowed;
 
@@ -67,6 +67,6 @@ contract UnlimitedAllowanceToken is IERC20 {
   }
 
   function totalSupply() public view returns (uint256) {
-    return totalSupply;
+    return supply;
   }
 }
