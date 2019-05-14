@@ -6,11 +6,11 @@ The `veil-contracts` repo includes various smart contracts developed by the Veil
 
 #### Current addresses of relevant contracts
 
-| Contract | Commit | Ethereum Address |
-|----------|--------|------------------|
-| [`Veil Ether`](/contracts/VeilEther.sol) | [5f5d6cf324](https://github.com/veilco/veil-contracts/tree/5f5d6cf3241f915495ed971d47f18d95cfa43672) | [0x53b04999c1ff2d77fcdde98935bb936a67209e4c](https://etherscan.io/address/0x53b04999c1ff2d77fcdde98935bb936a67209e4c) |
+| Contract                                                              | Commit                                                                                               | Ethereum Address                                                                                                      |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| [`Veil Ether`](/contracts/VeilEther.sol)                              | [5f5d6cf324](https://github.com/veilco/veil-contracts/tree/5f5d6cf3241f915495ed971d47f18d95cfa43672) | [0x53b04999c1ff2d77fcdde98935bb936a67209e4c](https://etherscan.io/address/0x53b04999c1ff2d77fcdde98935bb936a67209e4c) |
 | [`VirtualAugurShareFactory`](/contracts/VirtualAugurShareFactory.sol) | [97be1e2334](https://github.com/veilco/veil-contracts/tree/97be1e2334df2475669cf481333486c4d29eaedb) | [0x94888179c352fdf7fbfbdf436651e516c83cfe37](https://etherscan.io/address/0x94888179c352fdf7fbfbdf436651e516c83cfe37) |
-| [`OracleBridge`](/contracts/OracleBridge.sol) | - | - |
+| [`OracleBridge`](/contracts/OracleBridge.sol)                         | -                                                                                                    | -                                                                                                                     |
 
 ## Usage
 
@@ -40,12 +40,11 @@ yarn
 Rename development.env to .env and set some environment variables:
 
 ```bash
-MNEMONIC=...
-INFURA_API_KEY=...
-JSON_RPC_PORT=8545
+MNEMONIC=<INSERT MNEMONIC OF ADDRESS DEPLOYING CONTRACTS>
+ALCHEMY_API_KEY=<INSERT ALCHMEY API KEY>
 ```
 
-You can generate a MNEMONIC using [Metamask](https://metamask.io/) and get an API key from [Infura](https://infura.io/signup)
+You can generate a MNEMONIC using [Metamask](https://metamask.io/) and get an API key from [Alchemy](https://alchemyapi.io/)
 
 Start a local blockchain like [Ganache](https://github.com/trufflesuite/ganache). You can use [Ganache CLI](https://github.com/trufflesuite/ganache-cli) or the [desktop client](http://truffleframework.com/ganache/).
 
@@ -97,11 +96,12 @@ To let users skip all of these transactions, we’ve built [Virtual Augur Shares
 
 To support [AugurLite](https://github.com/veilco/augur-lite), we developed a smart contract to resolve AugurLite markets. This contract, [OracleBridge](/contracts/OracleBridge.sol) stores a mapping of markets to their resolvers, addresses that can finalize AugurLite markets by calling the `resolve` method in OracleBridge. Effectively OracleBridge is the resolver for many markets, but it can delegate resolving responsibility to another address or smart contract.
 
-This design enables the deployment of additional smart contracts that sit between OracleBridge and oracles, like Augur, that pass along state from the oracle to OracleBridge—and ultimately AugurLite. So once the Augur oracles finalizes a market, the bridge contract can observe the market's outcome and pass it to the `resolve` method to resolve AugurLite markets. The same system could be used to pull state from other oracles, and OracleBridge is responsible only for determining which address can call the `resolve` method for a given market.
+This design enables the deployment of additional smart contracts that sit between OracleBridge and oracles, like Augur, that pass along state from the oracle to OracleBridge—and ultimately AugurLite. So once the Augur oracles finalize a market, the bridge contract can observe the market's outcome and pass it to the `resolve` method to resolve AugurLite markets. The same system could be used to pull state from other oracles, and OracleBridge is responsible only for determining which address can call the `resolve` method for a given market.
 
 ## Questions and support
 
 If you have questions, comments, or ideas, we recommend pursuing one of these channels:
+
 -   Open an issue or pull request in this repository
 -   Reach out to [@veil on Twitter](https://twitter.com/veil)
 -   Send an email to [hello@veil.co](mailto:hello@veil.co)
@@ -110,4 +110,5 @@ If you have questions, comments, or ideas, we recommend pursuing one of these ch
 `veil-contracts` is maintained by [@mertcelebi](https://github.com/mertcelebi), [@gkaemmer](https://github.com/gkaemmer), and [@pfletcherhill](https://github.com/pfletcherhill).
 
 ## License
+
 The Veil smart contracts are released under the MIT License. [See License](/LICENSE).
