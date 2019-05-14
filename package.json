@@ -1,13 +1,8 @@
 {
   "name": "veil-contracts",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Smart contracts for Veil",
   "main": "index.js",
-  "files": [
-    "index.js",
-    "build/**/*",
-    "contracts/**/*"
-  ],
   "scripts": {
     "test": "truffle test",
     "lint": "solium --dir ./contracts",
@@ -17,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/veilmarket/veil-contracts.git"
+    "url": "git+https://github.com/veilco/veil-contracts.git"
   },
   "author": "Veil",
   "devDependencies": {
