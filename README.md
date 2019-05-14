@@ -1,20 +1,24 @@
+<img src="https://veil.co/static/logo-blue.png" width="200px" />
+
 # Veil Smart Contracts
 
-`veil-contracts` repo includes [Veil Ether](https://github.com/veilco/veil-contracts/blob/master/contracts/VeilEther.sol) and Veil’s [Virtual Augur Shares](https://github.com/veilco/veil-contracts/blob/master/contracts/VirtualAugurShare.sol) template, two smart contracts that we’ve built to improve the experience of onboarding and trading on Veil.
+The `veil-contracts` repo includes various smart contracts developed by the Veil team and deployed to Ethereum. These include [Veil Ether](/contracts/VeilEther.sol), Veil’s [Virtual Augur Shares](/contracts/VirtualAugurShare.sol) template, [OracleBridge](/contracts/OracleBridge.sol), and two smart contracts that we’ve built to improve the experience of onboarding and trading on Veil.
 
-VeilEther as of commit [5f5d6cf3241f915495ed971d47f18d95cfa43672](https://github.com/veilco/veil-contracts/tree/5f5d6cf3241f915495ed971d47f18d95cfa43672) is deployed at [0x53b04999c1ff2d77fcdde98935bb936a67209e4c](https://etherscan.io/address/0x53b04999c1ff2d77fcdde98935bb936a67209e4c). VirtualAugurShareFactory as of commit [97be1e2334df2475669cf481333486c4d29eaedb](https://github.com/veilco/veil-contracts/tree/97be1e2334df2475669cf481333486c4d29eaedb) is deployed at [0x94888179c352fdf7fbfbdf436651e516c83cfe37](https://etherscan.io/address/0x94888179c352fdf7fbfbdf436651e516c83cfe37).
+#### Current addresses of relevant contracts
+
+| Contract | Commit | Ethereum Address |
+|----------|--------|------------------|
+| [`Veil Ether`](/contracts/VeilEther.sol) | [5f5d6cf324](https://github.com/veilco/veil-contracts/tree/5f5d6cf3241f915495ed971d47f18d95cfa43672) | [0x53b04999c1ff2d77fcdde98935bb936a67209e4c](https://etherscan.io/address/0x53b04999c1ff2d77fcdde98935bb936a67209e4c) |
+| [`VirtualAugurShareFactory`](/contracts/VirtualAugurShareFactory.sol) | [97be1e2334](https://github.com/veilco/veil-contracts/tree/97be1e2334df2475669cf481333486c4d29eaedb) | [0x94888179c352fdf7fbfbdf436651e516c83cfe37](https://etherscan.io/address/0x94888179c352fdf7fbfbdf436651e516c83cfe37) |
+| [`OracleBridge`](/contracts/OracleBridge.sol) | - | - |
+
+## Usage
 
 Install:
 
 ```bash
 yarn add veil-contracts
 ```
-
-## Questions?
-
-Join us on [Discord](https://discord.gg/aBfTCVU) or email us at `hello@veil.market`. If you encounter a problem using this project, feel free to [open an issue](https://github.com/veilco/veil-contracts/issues).
-
-`veil-contracts` is maintained by [@mertcelebi](https://github.com/mertcelebi), [@gkaemmer](https://github.com/gkaemmer), and [@pfletcherhill](https://github.com/pfletcherhill).
 
 ## Development
 
@@ -62,7 +66,7 @@ yarn run ganache
 yarn run test
 ```
 
-## Deploying to Kovan, Mainnet
+## Deployment
 
 To deploy to Kovan or Mainnet, make sure your account (the first address derived from your MNEMONIC) has at least `0.3 ETH`, then run:
 
@@ -72,7 +76,7 @@ yarn run migrate:kovan
 yarn run migrate:mainnet
 ```
 
-## Notes about VeilEther and VirtualAugurShares
+## VeilEther and VirtualAugurShares
 
 Veil uses [0x](https://0x.org/) to let people trade shares in Augur markets, meaning users can immediately create orders without sending Ethereum transactions. Unfortunately it requires two awkward steps before users can trade:
 
@@ -88,3 +92,22 @@ The Veil smart contracts are designed to streamline Veil’s UX by removing the 
 The second step, unlocking tokens, poses a bigger challenge for Augur shares. Each market on Veil (and Augur more generally) introduces at least two new ERC-20 tokens — one for each outcome. For a user to trade or redeem their shares in those new markets, they’ll need to unlock both tokens. If a user trades on 10–20 markets, then they’re faced with an additional 20–40 Ethereum transactions. Obviously, at some point this becomes untenable, and it’s a bad user experience.
 
 To let users skip all of these transactions, we’ve built [Virtual Augur Shares](https://github.com/veilco/veil-contracts/blob/master/contracts/VirtualAugurShare.sol), a template for ERC-20 tokens that wrap Augur shares and approve them for trading on 0x. Each Virtual Augur Share is redeemable for a share in a specific Augur token, just like WETH is redeemable for ETH. And by default Virtual Augur Shares are pre-approved for trading on 0x, so users do not have to submit a second approve transaction.
+
+## OracleBridge
+
+To support [AugurLite](https://github.com/veilco/augur-lite), we developed a smart contract to resolve AugurLite markets. This contract, [OracleBridge](/contracts/OracleBridge.sol) stores a mapping of markets to their resolvers, addresses that can finalize AugurLite markets by calling the `resolve` method in OracleBridge. Effectively OracleBridge is the resolver for many markets, but it can delegate resolving responsibility to another address or smart contract.
+
+This design enables the deployment of additional smart contracts that sit between OracleBridge and oracles, like Augur, that pass along state from the oracle to OracleBridge—and ultimately AugurLite. So once the Augur oracles finalizes a market, the bridge contract can observe the market's outcome and pass it to the `resolve` method to resolve AugurLite markets. The same system could be used to pull state from other oracles, and OracleBridge is responsible only for determining which address can call the `resolve` method for a given market.
+
+## Questions and support
+
+If you have questions, comments, or ideas, we recommend pursuing one of these channels:
+-   Open an issue or pull request in this repository
+-   Reach out to [@veil on Twitter](https://twitter.com/veil)
+-   Send an email to [hello@veil.co](mailto:hello@veil.co)
+-   Join [Veil's discord](https://discord.gg/aBfTCVU) and reach out to a Veil team member
+
+`veil-contracts` is maintained by [@mertcelebi](https://github.com/mertcelebi), [@gkaemmer](https://github.com/gkaemmer), and [@pfletcherhill](https://github.com/pfletcherhill).
+
+## License
+The Veil smart contracts are released under the MIT License. [See License](/LICENSE).
