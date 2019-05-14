@@ -5,22 +5,21 @@ import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import { VirtualAugurShare } from "./VirtualAugurShare.sol";
 import { ICompleteSets } from "./ICompleteSets.sol";
 import { IMarket } from "./IMarket.sol";
-import { ICash } from "./ICash.sol";
 
 
 /**
- * @title VeilCompleteSets
+ * @title AugurLiteCompleteSets
  * @author Veil
  *
- * Simple utility contract to simplify the process of buying complete sets from Augur, wrapping
+ * Simple utility contract to simplify the process of buying complete sets from VeilAugur, wrapping
  * the complete sets in Virtual Augur Shares and transferring them to msg.sender.
  *
  * This contract is stateless, never holds funds, and can be swapped with another contract any time.
  */
-contract VeilCompleteSets {
+contract AugurLiteCompleteSets {
   using SafeMath for uint256;
 
-  event VeilBuyCompleteSets(address indexed sender, uint256 amount);
+  event VeilAugurBuyCompleteSets(address indexed sender, uint256 amount);
 
   /* ============ Constructor ============ */
 
@@ -36,20 +35,20 @@ contract VeilCompleteSets {
   }
 
   /**
-   * Buys Augur complete sets with Ether, wraps the complete set tokens in Virtual Augur Shares
+   * Buys VeilAugur complete sets with Ether, wraps the complete set tokens in Virtual Augur Shares
    * and transfers them to msg.sender
    *
-   * @param _augurContract       Augur contract address
-   * @param _augurCash           CASH address (Augur denomination token)
-   * @param _augurCompleteSets   Augur complete sets contract address
-   * @param _augurMarket         Augur market contract address
+   * @param _augurContract       VeilAugur contract address
+   * @param _token               Denomination token address
+   * @param _augurCompleteSets   VeilAugur complete sets contract address
+   * @param _augurMarket         VeilAugur market contract address
    * @param _virtualLongToken    Virtual Augur Share long token address
    * @param _virtualShortToken   Virtual Augur Share short token address
    * @param _amount              Amount of complete sets to buy
    */
   function buyCompleteSets(
     address _augurContract,
-    address _augurCash,
+    address _token,
     address _augurCompleteSets,
     address _augurMarket,
     address _virtualLongToken,
@@ -57,18 +56,16 @@ contract VeilCompleteSets {
     uint256 _amount
   )
     public
-    payable
     returns (bool)
   {
-    // Make sure the msg.value is the correct amount to prevent excess fund build-up in the contract
-    require(_amount.mul(IMarket(_augurMarket).getNumTicks()) == msg.value, "Msg.value is incorrect");
+    require(IMarket(_augurMarket).getDenominationToken() == _token, "Wrong type of token");
 
-    // Deposit Cash and buy complete sets
-    if (ICash(_augurCash).allowance(this, _augurContract) != uint256(-1)) {
-      require(ICash(_augurCash).approve(_augurContract, uint256(-1)), "Cash approval failed");
+    if (IERC20(_token).allowance(this, _augurContract) != uint256(-1)) {
+      require(IERC20(_token).approve(_augurContract, uint256(-1)), "Approval failed");
     }
-    ICash(_augurCash).depositEther.value(msg.value)();
-    ICompleteSets(_augurCompleteSets).publicBuyCompleteSetsWithCash(_augurMarket, _amount);
+
+    require(IERC20(_token).transferFrom(msg.sender, this, _amount.mul(IMarket(_augurMarket).getNumTicks())));
+    ICompleteSets(_augurCompleteSets).publicBuyCompleteSets(_augurMarket, _amount);
 
     // Make sure VAS contracts can transfer Augur shares
     IERC20 augurLongToken = IERC20(IMarket(_augurMarket).getShareToken(1));
@@ -89,7 +86,7 @@ contract VeilCompleteSets {
     require(virtualLong.depositAndTransfer(_amount, msg.sender), "VAS Long deposit and transfer failed");
     require(virtualShort.depositAndTransfer(_amount, msg.sender), "VAS Short deposit and transfer failed");
 
-    emit VeilBuyCompleteSets(msg.sender, _amount);
+    emit VeilAugurBuyCompleteSets(msg.sender, _amount);
     return true;
   }
 }
